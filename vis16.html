@@ -24,13 +24,13 @@
             // Get the data:
             d3.csv(table_now, function(error, data) {
                 data.forEach(function(d) {
-                    d.date = parseDate(d.date);
+                    d.year = getYear(d.date);
                 }); //parse the date
                 var startvalueline = d3.svg.line()
-                    .x(function(d) { return x(d.date); })
+                    .x(function(d) { return x(d.year); })
                     .y(function(d) { return y(0);      }) //base for transition
                 // Scale the range of the data:
-                x.domain(d3.extent(data, function(d) { return d.date; }));
+                x.domain(d3.extent(data, function(d) { return d.year; }));
                 y.domain([d3.min(defaultData, function(d) {
                       minYnow = Math.min(minYnow, d.y);
                       return minYnow; }),
@@ -66,7 +66,7 @@
                     upd_grid(); //update the grid
 
                     line_new = d3.svg.line()
-                        .x(function(d) { return x(d.date); })
+                        .x(function(d) { return x(d.year); })
                         .y(ny);
                     var this_id = "line"+lines_now.length; //console.log(this_id);
                     mins_now[lines_now.length] = mny;
@@ -74,7 +74,7 @@
                     lines_now[lines_now.length] = line_new; //console.log(lines_now.length);
 
                     // Scale the range of the data again
-                    x.domain(d3.extent(data, function(d) { return d.date; }));
+                    x.domain(d3.extent(data, function(d) { return d.year; }));
                     y.domain([Math.min(minYnow, mny),Math.max(maxYnow, Mny)]);
 
                     minYnow = Math.min(minYnow, mny);
@@ -123,7 +123,7 @@
 
 
                         // Scale the range of the data again
-                        x.domain(d3.extent(data, function(d) { return d.date; }));
+                        x.domain(d3.extent(data, function(d) { return d.year; }));
                         y.domain([minYnow,maxYnow]);
 
                         upd_grid(); //update the grid
@@ -142,7 +142,7 @@
                                 .attr("id", new_id)
                                 .style("stroke", colors[k])
                                 .attr("d", (lines_now[k])(data));
-                        }                
+                        }
                         // transition the rest:
                         for (k=liNum; k<lines_now.length; k++) {
                             nextint = k+1;
@@ -161,7 +161,7 @@
                         maxYnow = 0; //determine min/maxYnow
                         d3.selectAll("path.line").remove();
                     }
-                    
+
                 }
 
                 // check/uncheck (add/remove) line 0:

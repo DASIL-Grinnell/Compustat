@@ -12,7 +12,7 @@ var margin = {top: 30, right: 20, bottom: 30, left:50},
     width = 720 - margin.left - margin.right,
     height = 360 - margin.top - margin.bottom;
 // Parse the date:
-var parseDate = d3.time.format("%Y").parse;
+var getYear = d3.time.format("%Y").parse;
 // Set the ranges:
 var x = d3.time.scale().range([0, width]),
     y = d3.scale.linear().range([height,0]);
