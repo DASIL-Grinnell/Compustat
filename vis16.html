@@ -1,209 +1,209 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <link rel="stylesheet" type="text/css" href="styl.css">
-        <meta charset="UTF-8">
-    </head>
-    <body>
-        <div style="float: left;">
-            <div class="container" style="width:138px; height:138px; margin-top:30px;">
-                <input type="checkbox" id="check-1"/> Sector 1 <br />
-                <input type="checkbox" id="check-2"/> Sector 2 <br />
-            </div>
-            <div class="container" style="width:138px; height:138px; margin-top:20px;">
-                <input type="checkbox" id="check0"/> Company A <br />
-                <input type="checkbox" id="check1"/> Company B <br />
-                <input type="checkbox" id="check2"/> Company C <br />
-                <input type="checkbox" id="check3"/> Company D <br />
-            </div>
-        </div>
-        <script src="http://d3js.org/d3.v3.min.js"></script>
-        <script src="const.js"></script>
-        <script>
-            var table_now = "dat3.csv"; //which .csv are we extracting from
-            var lines_now = []; //array containing the lines graphed at any moment
-            var mins_now = []; var maxs_now = []; //array, all lines' mins/maxs
-            var mapper = [];
-            // Get the data:
-            d3.csv(table_now, function(error, data) {
-                data.forEach(function(datum) {
-                    datum.year = getYear(datum.date);
-                }); //parse the date
-                var startvalueline = d3.svg.line()
-                    .x(function(datum) { return x(datum.year); })
-                    .y(function(datum) { return y(0);      }) //base for transition
-                // Scale the range of the data:
-                x.domain(d3.extent(data, function(datum) { return datum.year; }));
-                y.domain([d3.min(defaultData, function(datum) {
-                      minYnow = Math.min(minYnow, datum.y);
-                      return minYnow; }),
-                          d3.max(defaultData, function(datum) {
-                      maxYnow = Math.max(maxYnow, datum.y);
-                      return maxYnow; })]);
-                // Add grid lines:
-                svg.append("g")
-                    .attr("class", "grid")
-                    .attr("transform", "translate(0," + height + ")")
-                    .call(make_x_axis()
-                    .tickSize(-height, 0, 0)
-                    .tickFormat("")
-                )
-                svg.append("g")
-                    .attr("class", "grid")
-                    .call(make_y_axis()
-                    .tickSize(-width, 0, 0)
-                    .tickFormat("")
-                )
-                //Add the X Axis
-                svg.append("g")
-                    .attr("class", "x axis")
-                    .attr("transform", "translate(0," + height + ")")
-                    .call(xAxis);
-                //Add the Y Axis
-                svg.append("g")
-                    .attr("class", "y axis")
-                    .call(yAxis);
+  <head>
+    <link rel="stylesheet" type="text/css" href="styl.css">
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <div style="float: left;">
+      <div class="container" style="width:138px; height:138px; margin-top:30px;">
+        <input type="checkbox" id="check-1"/> Sector 1 <br />
+        <input type="checkbox" id="check-2"/> Sector 2 <br />
+      </div>
+      <div class="container" style="width:138px; height:138px; margin-top:20px;">
+        <input type="checkbox" id="check0"/> Company A <br />
+        <input type="checkbox" id="check1"/> Company B <br />
+        <input type="checkbox" id="check2"/> Company C <br />
+        <input type="checkbox" id="check3"/> Company D <br />
+      </div>
+  </div>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="const.js"></script>
+    <script>
+    var table_now = "dat3.csv"; //which .csv are we extracting from
+    var lines_now = []; //array containing the lines graphed at any moment
+    var mins_now = []; var maxs_now = []; //array, all lines' mins/maxs
+    var mapper = [];
+    // Get the data:
+    d3.csv(table_now, function(error, data) {
+      data.forEach(function(datum) {
+        datum.year = getYear(datum.date);
+      }); //parse the date
+      var startvalueline = d3.svg.line()
+      .x(function(datum) { return x(datum.year); })
+      .y(function(datum) { return y(0);      }) //base for transition
+      // Scale the range of the data:
+      x.domain(d3.extent(data, function(datum) { return datum.year; }));
+      y.domain([d3.min(defaultData, function(datum) {
+        minYnow = Math.min(minYnow, datum.y);
+        return minYnow; }),
+        d3.max(defaultData, function(datum) {
+          maxYnow = Math.max(maxYnow, datum.y);
+          return maxYnow; })]);
+          // Add grid lines:
+          svg.append("g")
+          .attr("class", "grid")
+          .attr("transform", "translate(0," + height + ")")
+          .call(make_x_axis()
+          .tickSize(-height, 0, 0)
+          .tickFormat("")
+        )
+        svg.append("g")
+        .attr("class", "grid")
+        .call(make_y_axis()
+        .tickSize(-width, 0, 0)
+        .tickFormat("")
+      )
+      //Add the X Axis
+      svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+      //Add the Y Axis
+      svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
 
 
-                function addLine(line_num, ny, mny, Mny) {
-                    upd_grid(); //update the grid
+      function addLine(line_num, ny, mny, Mny) {
+        upd_grid(); //update the grid
 
-                    line_new = d3.svg.line()
-                        .x(function(datum) { return x(datum.year); })
-                        .y(ny);
-                    var this_id = "line"+lines_now.length; //console.log(this_id);
-                    mins_now[lines_now.length] = mny;
-                    maxs_now[lines_now.length] = Mny;
-                    lines_now[lines_now.length] = line_new; //console.log(lines_now.length);
+        line_new = d3.svg.line()
+        .x(function(datum) { return x(datum.year); })
+        .y(ny);
+        var this_id = "line"+lines_now.length; //console.log(this_id);
+        mins_now[lines_now.length] = mny;
+        maxs_now[lines_now.length] = Mny;
+        lines_now[lines_now.length] = line_new; //console.log(lines_now.length);
 
-                    // Scale the range of the data again
-                    x.domain(d3.extent(data, function(datum) { return datum.year; }));
-                    y.domain([Math.min(minYnow, mny),Math.max(maxYnow, Mny)]);
+        // Scale the range of the data again
+        x.domain(d3.extent(data, function(datum) { return datum.year; }));
+        y.domain([Math.min(minYnow, mny),Math.max(maxYnow, Mny)]);
 
-                    minYnow = Math.min(minYnow, mny);
-                    maxYnow = Math.max(maxYnow, Mny);
+        minYnow = Math.min(minYnow, mny);
+        maxYnow = Math.max(maxYnow, Mny);
 
-                    svg.select(".x.axis") // change the x axis
-                        .transition()
-                        .call(xAxis);
-                    svg.select(".y.axis") // change the y axis
-                        .transition()
-                        .call(yAxis);
+        svg.select(".x.axis") // change the x axis
+        .transition()
+        .call(xAxis);
+        svg.select(".y.axis") // change the y axis
+        .transition()
+        .call(yAxis);
 
-                    for (j=0; j<lines_now.length; j++) {
-                        d3.select("#line"+j)
-                            .transition()
-                            .attr("d", (lines_now[j])(data));
-                    }
+        for (j=0; j<lines_now.length; j++) {
+          d3.select("#line"+j)
+          .transition()
+          .attr("d", (lines_now[j])(data));
+        }
 
-                    svg.append("path")
-                        .attr("class", "line")
-                        .attr("line_num", line_num)
-                        .attr("id", this_id)
-                        .style("stroke", colors[lines_now.length-1])
-                        .attr("d", startvalueline(data))
-                        .transition()
-                        .attr("d", line_new(data));
-                    //console.log(d3.select("[line_num='0']").attr("id"));
-                };
+        svg.append("path")
+        .attr("class", "line")
+        .attr("line_num", line_num)
+        .attr("id", this_id)
+        .style("stroke", colors[lines_now.length-1])
+        .attr("d", startvalueline(data))
+        .transition()
+        .attr("d", line_new(data));
+        //console.log(d3.select("[line_num='0']").attr("id"));
+      };
 
-                function removeLine(liNum) {
-                    var nextint; //synonym for k+1
-                    if (lines_now.length > 1) {
-                        for (k=liNum; k<lines_now.length-1; k++) {
-                            lines_now[k] = lines_now[k+1];
-                            mins_now[k] = mins_now[k+1];
-                            maxs_now[k] = maxs_now[k+1];
-                        } //shift
-                        lines_now.splice(-1,1);
-                        mins_now.splice(-1,1);
-                        maxs_now.splice(-1,1); //remove last
-                        minYnow = Math.min.apply(Math, mins_now);
-                        maxYnow = Math.max.apply(Math, maxs_now); //determine min/maxYnow
+      function removeLine(liNum) {
+        var nextint; //synonym for k+1
+        if (lines_now.length > 1) {
+          for (k=liNum; k<lines_now.length-1; k++) {
+            lines_now[k] = lines_now[k+1];
+            mins_now[k] = mins_now[k+1];
+            maxs_now[k] = maxs_now[k+1];
+          } //shift
+          lines_now.splice(-1,1);
+          mins_now.splice(-1,1);
+          maxs_now.splice(-1,1); //remove last
+          minYnow = Math.min.apply(Math, mins_now);
+          maxYnow = Math.max.apply(Math, maxs_now); //determine min/maxYnow
 
-                        // un-draw the line:
-                        d3.select("#line"+liNum).remove();
-
-
-                        // Scale the range of the data again
-                        x.domain(d3.extent(data, function(datum) { return datum.year; }));
-                        y.domain([minYnow,maxYnow]);
-
-                        upd_grid(); //update the grid
-                        svg.select(".x.axis") // change the x axis
-                            .transition()
-                            .call(xAxis);
-                        svg.select(".y.axis") // change the y axis
-                            .transition()
-                            .call(yAxis);
+          // un-draw the line:
+          d3.select("#line"+liNum).remove();
 
 
-                        // transition all till < liNum:
-                        for (k=0; k<liNum; k++) {
-                            d3.select("#line"+k)
-                                //.transition()
-                                .attr("id", new_id)
-                                .style("stroke", colors[k])
-                                .attr("d", (lines_now[k])(data));
-                        }
-                        // transition the rest:
-                        for (k=liNum; k<lines_now.length; k++) {
-                            nextint = k+1;
-                            new_id = "line"+k;
-                            d3.select("#line"+nextint)
-                                .transition()
-                                .attr("id", new_id)
-                                .style("stroke", colors[k])
-                                .attr("d", (lines_now[k])(data));
-                        }
-                    } else {
-                        lines_now.splice(-1,1);
-                        mins_now.splice(-1,1);
-                        maxs_now.splice(-1,1); //remove last
-                        minYnow = 0;
-                        maxYnow = 0; //determine min/maxYnow
-                        d3.selectAll("path.line").remove();
-                    }
+          // Scale the range of the data again
+          x.domain(d3.extent(data, function(datum) { return datum.year; }));
+          y.domain([minYnow,maxYnow]);
 
-                }
+          upd_grid(); //update the grid
+          svg.select(".x.axis") // change the x axis
+          .transition()
+          .call(xAxis);
+          svg.select(".y.axis") // change the y axis
+          .transition()
+          .call(yAxis);
 
-                // check/uncheck (add/remove) line 0:
-                var val0 = (function(datum) { return y(+datum.valu) });
-                var val0_min = d3.min(data, function(datum) { return +datum.valu });
-                var val0_max = d3.max(data, function(datum) { return +datum.valu });
-                d3.select("#check0").on("click", function() {
-                    if (document.getElementById("check0").checked)
-                        addLine(0, val0, val0_min, val0_max);
-                    else removeLine(0);
-                });
-                // check/uncheck (add/remove) line 1:
-                var val1 = (function(datum) { return y(+datum.close) });
-                var val1_min = d3.min(data, function(datum) { return +datum.close });
-                var val1_max = d3.max(data, function(datum) { return +datum.close });
-                d3.select("#check1").on("click", function() {
-                    if (document.getElementById("check1").checked)
-                        addLine(1, val1, val1_min, val1_max);
-                    else removeLine(0);
-                });
-                // check/uncheck (add/remove) line 2:
-                var val2 = (function(datum) { return y(+datum.w) });
-                var val2_min = d3.min(data, function(datum) { return +datum.w });
-                var val2_max = d3.max(data, function(datum) { return +datum.w });
-                d3.select("#check2").on("click", function() {
-                    if (document.getElementById("check2").checked)
-                        addLine(2, val2, val2_min, val2_max);
-                    else removeLine(0);
-                });
-                // check/uncheck (add/remove) line 3:
-                var val3 = (function(datum) { return y(+datum.z) });
-                var val3_min = d3.min(data, function(datum) { return +datum.z });
-                var val3_max = d3.max(data, function(datum) { return +datum.z });
-                d3.select("#check3").on("click", function() {
-                    if (document.getElementById("check3").checked)
-                        addLine(3, val3, val3_min, val3_max);
-                    else removeLine(0);
-                });
-            });
-        </script>
-    </body>
+
+          // transition all till < liNum:
+          for (k=0; k<liNum; k++) {
+            d3.select("#line"+k)
+            //.transition()
+            .attr("id", new_id)
+            .style("stroke", colors[k])
+            .attr("d", (lines_now[k])(data));
+          }
+          // transition the rest:
+          for (k=liNum; k<lines_now.length; k++) {
+            nextint = k+1;
+            new_id = "line"+k;
+            d3.select("#line"+nextint)
+            .transition()
+            .attr("id", new_id)
+            .style("stroke", colors[k])
+            .attr("d", (lines_now[k])(data));
+          }
+        } else {
+          lines_now.splice(-1,1);
+          mins_now.splice(-1,1);
+          maxs_now.splice(-1,1); //remove last
+          minYnow = 0;
+          maxYnow = 0; //determine min/maxYnow
+          d3.selectAll("path.line").remove();
+        }
+
+      }
+
+      // check/uncheck (add/remove) line 0:
+      var val0 = (function(datum) { return y(+datum.valu) });
+      var val0_min = d3.min(data, function(datum) { return +datum.valu });
+      var val0_max = d3.max(data, function(datum) { return +datum.valu });
+      d3.select("#check0").on("click", function() {
+        if (document.getElementById("check0").checked)
+        addLine(0, val0, val0_min, val0_max);
+        else removeLine(0);
+      });
+      // check/uncheck (add/remove) line 1:
+      var val1 = (function(datum) { return y(+datum.close) });
+      var val1_min = d3.min(data, function(datum) { return +datum.close });
+      var val1_max = d3.max(data, function(datum) { return +datum.close });
+      d3.select("#check1").on("click", function() {
+        if (document.getElementById("check1").checked)
+        addLine(1, val1, val1_min, val1_max);
+        else removeLine(0);
+      });
+      // check/uncheck (add/remove) line 2:
+      var val2 = (function(datum) { return y(+datum.w) });
+      var val2_min = d3.min(data, function(datum) { return +datum.w });
+      var val2_max = d3.max(data, function(datum) { return +datum.w });
+      d3.select("#check2").on("click", function() {
+        if (document.getElementById("check2").checked)
+        addLine(2, val2, val2_min, val2_max);
+        else removeLine(0);
+      });
+      // check/uncheck (add/remove) line 3:
+      var val3 = (function(datum) { return y(+datum.z) });
+      var val3_min = d3.min(data, function(datum) { return +datum.z });
+      var val3_max = d3.max(data, function(datum) { return +datum.z });
+      d3.select("#check3").on("click", function() {
+        if (document.getElementById("check3").checked)
+        addLine(3, val3, val3_min, val3_max);
+        else removeLine(0);
+      });
+    });
+    </script>
+  </body>
 </html>
