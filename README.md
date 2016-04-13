@@ -1,1 +1,1 @@
-# D3
+# Grinnell DASIL Compustat
