@@ -9,6 +9,21 @@
     <title>DASIL Proof of Concept</title>
   </head>
   <body>
+    Sector:
+    <select id="sectorSelector" onchange="didSelectSector(this)">
+      <option value="Something else">Something else</option>
+      <option value="Consumer Discretionary">Consumer Discretionary</option>
+    </select>
+    Industry:
+    <select id="industrySelector" onchange="didSelectIndustry(this)">
+      <option>----</option>
+    </select>
+    Company:
+    <select id="companySelector">
+      <option>----</option>
+    </select>
+    <button onclick="addLine()">Add</button>
+    
     <div id="myDiv" style="width: 100%; height: 100%;"><!-- Plotly chart will be drawn inside this DIV --></div>
     <script src="js/main.js"></script>
   </body>
