@@ -33,6 +33,13 @@ var sampleSectors = [
               x: ['2000-01-01',    '2001-01-01',   '2002-01-01',  '2003-01-01',  '2004-01-01',   '2005-01-01', '2006-01-01'],
               y: [-4.243, 0.508, 50.766, -17.884, 4.728, 9.32, 18.372]
             }
+          },
+          {
+            company: "Asbury Automotive Group Inc",
+            data: {
+              x: ['2000-01-01',    '2001-01-01',   '2002-01-01',  '2003-01-01',  '2004-01-01',   '2005-01-01', '2006-01-01'],
+              y: [4.243, 0.908, -50.766, 17.884, 34.728, 0.32, 18.372]
+            }
           }
         ]
       }
@@ -142,28 +149,51 @@ function flatten(ary) {
 
 function didSelectSector(select) {
   var industrySel = document.getElementById("industrySelector")
-  for (i = 0; i < industrySel.options.length; i++)
-    industrySel.options[i] = null;
   var industries = sectors.getIndustries(select.value);
+  clearIndustryDropdown();
   for (industry in industries) {
     var opt = document.createElement("option")
     opt.value= industries[industry];
     opt.innerHTML = industries[industry];
     industrySel.appendChild(opt);
   }
+  industrySel.value = industries[0]
+  didSelectIndustry(industrySel)
 }
 
 function didSelectIndustry(select) {
   var companySel = document.getElementById("companySelector")
-  for (i = 0; i < companySel.options.length; i++)
-    companySel.options[i] = null;
+  clearCompanyDropdown();
+  console.log(select.value)
   var companies = sectors.getCompanies(select.value)
   for (company in companies) {
     var opt = document.createElement("option");
     opt.value = companies[company];
     opt.innerHTML = companies[company];
     companySel.appendChild(opt);
-  } 
+  }
+  
+}
+
+function clearSectorDropdown(){
+  var sectorDropdown = document.getELementById("sectorSelector")
+  selectorDropdown.options.length = 0;
+}
+
+function clearIndustryDropdown() {
+  var industrySel = document.getElementById("industrySelector")
+  industrySel.options.length = 0;
+}
+
+function clearCompanyDropdown() {
+  var companySel = document.getElementById("companySelector")
+  companySel.options.length = 0;
+}
+
+function clearDropdowns() {
+  //clearSectorDropdown();
+  clearIndustryDropdown();
+  clearCompanyDropdown();
 }
 
 function addLine() {
@@ -186,3 +216,5 @@ function addLine() {
     }
   }
 }
+
+plotTracesInDiv("myDiv",displayedTraces);
