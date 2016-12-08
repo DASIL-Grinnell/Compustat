@@ -1,6 +1,6 @@
 let XAXIS_LABEL = "Year";
-let YAXIS_LABEL = "?";
-let GRAPH_TITLE = "Compustat";
+let YAXIS_LABEL = "Datapoints";
+let GRAPH_TITLE = "Consumer Discretionary Sector";
 let CSV_URL = "./cdc.csv";
 
 var displayedTraces = [];
@@ -156,4 +156,5 @@ function addLine() {
   plotTracesInDiv("myDiv", displayedTraces);
 }
 
+fetchCompanies();
 plotTracesInDiv("myDiv",displayedTraces);
