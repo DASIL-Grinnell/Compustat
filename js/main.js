@@ -5,50 +5,14 @@ let CSV_URL = "./cdc.csv";
 
 var displayedTraces = [];
 
-var sampleSectors = [
-  { 
-    sector: "Consumer Discretionary",
-    average: 0,
-    industries: [
-      {
-        industry: "Automobiles",
-        average: 0,
-        companies: [
-          {
-            company: "Zap",
-            data: {
-              x: ['2000-01-01',    '2001-01-01',   '2002-01-01',  '2003-01-01',  '2004-01-01',   '2005-01-01', '2006-01-01'],
-              y: [0.359, -2.701,- 0.492, 0.201, 4.803, -3.807, 0.613]
-            }
-          }
-        ]
-      },
-      {
-        industry: "Retailing",
-        average: 0,
-        companies: [
-          {
-            company: "A.C. Moore Arts & Crafts Inc",
-            data: {
-              x: ['2000-01-01',    '2001-01-01',   '2002-01-01',  '2003-01-01',  '2004-01-01',   '2005-01-01', '2006-01-01'],
-              y: [-4.243, 0.508, 50.766, -17.884, 4.728, 9.32, 18.372]
-            }
-          },
-          {
-            company: "Asbury Automotive Group Inc",
-            data: {
-              x: ['2000-01-01',    '2001-01-01',   '2002-01-01',  '2003-01-01',  '2004-01-01',   '2005-01-01', '2006-01-01'],
-              y: [4.243, 0.908, -50.766, 17.884, 34.728, 0.32, 18.372]
-            }
-          }
-        ]
-      }
-    ]
-  }
-]
-
 var sectors = {
-  data: sampleSectors,
+  data: {},
+  insertCompany: function(company) {
+    this.data[company.sector][company.industry][company.name] = {
+      x: ['2000-01-01',    '2001-01-01',   '2002-01-01',  '2003-01-01',  '2004-01-01',   '2005-01-01', '2006-01-01'],
+      y: company.datapoints
+    }
+  },
   getSectors: function(){
     return this.data.map(function(datum) {
       return datum.sector;
@@ -109,14 +73,20 @@ function plotTracesInDiv(divID, traces) {
   Plotly.newPlot(divID, traces, layout);
 }
 
-function fetchCompanies(row,complete) {
-  Papa.parse(CSV_URL, {
-    download: true,
-    header: true,
-    // function(row)
-    step: row,
-    // function()
-    complete: complete,
+function fetchCompanies(complete) {
+  d3.csv("cdc.csv", function(error, data) {
+    let companies = data.map(function(d) {
+      var company = {}
+      company.name = d['Company Name']
+      company.industry = d['GICS Industry (Descr)']
+      company.sector =  d['GICS Econ Sect (Descr)']
+      company.datapoints = [d['2000'],d['2001'],d['2002'],d['2003'],d['2004'],d['2005'],d['2006'],d['2007'],d['2008'],d['2009'],d['2010'],d['2011'],d['2012'],d['2013'],d['2014']]
+      return company
+    });
+    for (company in companies) {
+     sectors.insertCompany(company) 
+    }
+    if (complete) { complete() }
   });
 }
 
@@ -172,7 +142,6 @@ function didSelectIndustry(select) {
     opt.innerHTML = companies[company];
     companySel.appendChild(opt);
   }
-  
 }
 
 function clearSectorDropdown(){
