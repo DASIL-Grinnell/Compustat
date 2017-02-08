@@ -5,87 +5,37 @@ let CSV_URL = "./cdc.csv";
 
 var displayedTraces = [];
 
-var sampleSectors = [
-  { 
-    sector: "Consumer Discretionary",
-    average: 0,
-    industries: [
-      {
-        industry: "Automobiles",
-        average: 0,
-        companies: [
-          {
-            company: "Zap",
-            data: {
-              x: ['2000-01-01',    '2001-01-01',   '2002-01-01',  '2003-01-01',  '2004-01-01',   '2005-01-01', '2006-01-01'],
-              y: [0.359, -2.701,- 0.492, 0.201, 4.803, -3.807, 0.613]
-            }
-          }
-        ]
-      },
-      {
-        industry: "Retailing",
-        average: 0,
-        companies: [
-          {
-            company: "A.C. Moore Arts & Crafts Inc",
-            data: {
-              x: ['2000-01-01',    '2001-01-01',   '2002-01-01',  '2003-01-01',  '2004-01-01',   '2005-01-01', '2006-01-01'],
-              y: [-4.243, 0.508, 50.766, -17.884, 4.728, 9.32, 18.372]
-            }
-          },
-          {
-            company: "Asbury Automotive Group Inc",
-            data: {
-              x: ['2000-01-01',    '2001-01-01',   '2002-01-01',  '2003-01-01',  '2004-01-01',   '2005-01-01', '2006-01-01'],
-              y: [4.243, 0.908, -50.766, 17.884, 34.728, 0.32, 18.372]
-            }
-          }
-        ]
-      }
-    ]
-  }
-]
-
 var sectors = {
-  data: sampleSectors,
-  getSectors: function(){
-    return this.data.map(function(datum) {
-      return datum.sector;
-    });
+  data: {},
+  insert: function(sector,industry,company,data) {
+    if (!this.data[sector]) {
+      this.data[sector] = {}
+    }
+    if (!this.data[sector][industry]) {
+      this.data[sector][industry] = {}
+    }
+    this.data[sector][industry][company] = data
   },
-  getIndustries: function(sector) {
-    return flatten(this.data.map(function(datum) {
-      if (sector == null || datum.sector == sector){
-        return datum.industries.map(function(indust){
-          return indust.industry
-        });
-      }
-    }));
+  listSectors: function() {
+    return Object.keys(this.data).filter(function(x){return x != ""})
   },
-  getCompanies: function(industry) {
-    return flatten(this.data.map(function(sectors) {
-      return flatten (sectors.industries.map(function(indust) {
-        if (industry == null || industry == indust.industry) {
-          return indust.companies.map(function(company) {
-            return company.company
-          });
-        };
-      }));
-    }));
+  listIndustries: function(sector) {
+    return Object.keys(this.data[sector]).filter(function(x){return x != ""})
+  },
+  listCompanies: function(sector, industry) {
+    return Object.keys(this.data[sector][industry]).filter(function(x){return x != ""})
   }
 }
 
 // Returns array of industries in sector. Null for all sectors
 
-function traceForCompany(company) {
+function traceForCompany(name, data) {
   var trace = {};
 
-  trace.x = company.data.x;
-  trace.y = company.data.y;
+  trace.x = data.x;
+  trace.y = data.y;
   trace.type = 'scatter';
-  trace.name = company.company;
-  console.log(trace)
+  trace.name = name;
   return trace;
 }
 
@@ -109,12 +59,12 @@ function plotTracesInDiv(divID, traces) {
   Plotly.newPlot(divID, traces, layout);
 }
 
-function fetchCompanies(row,complete) {
+function fetchCompanies(complete) {
   Papa.parse(CSV_URL, {
     download: true,
     header: true,
     // function(row)
-    step: row,
+    step: companyFromRow,
     // function()
     complete: complete,
   });
@@ -122,16 +72,14 @@ function fetchCompanies(row,complete) {
 
 function companyFromRow(row) {
   let obj = row.data[0];
-  let industry = obj.Industry
-  let company = obj.Company
-  let cpny = {
-      name: obj.Company,
-      data: {
+  let sector = obj["GICS Econ Sect (Descr)"]
+  let industry = obj["GICS Industry (Descr)"]
+  let company = obj["Company Name"]
+  let data = {
         x: ['1998-01-01' , '1999-01-01', '2000-01-01', '2001-01-01', '2002-01-01','2003-01-01', '2004-01-01', '2005-01-01', '2006-01-01','2007-01-01','2008-01-01','2009-01-01','2010-01-01','2011-01-01','2012-01-01','2013-01-01'],
         y: [obj["1998"], obj["1999"], obj["2000"], obj["2001"], obj["2002"], obj["2003"], obj["2004"], obj["2005"], obj["2006"], obj["2007"], obj["2008"], obj["2009"], obj["2010"], obj["2011"], obj["2012"], obj["2013"]]
-      },
-  }
-  companies.push(cpny);
+      }
+  sectors.insert(sector, industry,company,data)
 }
 
 
@@ -149,9 +97,9 @@ function flatten(ary) {
 
 function didSelectSector(select) {
   var industrySel = document.getElementById("industrySelector")
-  var industries = sectors.getIndustries(select.value);
+  var industries = sectors.listIndustries(select.value);
   clearIndustryDropdown();
-  for (industry in industries) {
+  for (var industry in industries) {
     var opt = document.createElement("option")
     opt.value= industries[industry];
     opt.innerHTML = industries[industry];
@@ -162,22 +110,21 @@ function didSelectSector(select) {
 }
 
 function didSelectIndustry(select) {
+  var sector = document.getElementById("sectorSelector").value
   var companySel = document.getElementById("companySelector")
   clearCompanyDropdown();
-  console.log(select.value)
-  var companies = sectors.getCompanies(select.value)
-  for (company in companies) {
+  var companies = sectors.listCompanies(sector, select.value)
+  for (var company in companies) {
     var opt = document.createElement("option");
     opt.value = companies[company];
     opt.innerHTML = companies[company];
     companySel.appendChild(opt);
   }
-  
 }
 
 function clearSectorDropdown(){
-  var sectorDropdown = document.getELementById("sectorSelector")
-  selectorDropdown.options.length = 0;
+  var sectorDropdown = document.getElementById("sectorSelector")
+  sectorDropdown.options.length = 0;
 }
 
 function clearIndustryDropdown() {
@@ -200,21 +147,21 @@ function addLine() {
   var sectorName = document.getElementById("sectorSelector").value
   var industryName = document.getElementById("industrySelector").value
   var companyName = document.getElementById("companySelector").value
-  for (sector in sectors.data) {
-    if (sectors.data[sector].sector == sectorName) {
-      for (industry in sectors.data[sector].industries) {
-        if (sectors.data[sector].industries[industry].industry == industryName) {
-          for (company in sectors.data[sector].industries[industry].companies) {
-            if (sectors.data[sector].industries[industry].companies[company].company == companyName) {
-              console.log("Found company");
-              displayedTraces.push(traceForCompany(sectors.data[sector].industries[industry].companies[company]))
-              plotTracesInDiv("myDiv", displayedTraces);
-            }
-          }
-        }
-      }
-    }
-  }
+  displayedTraces.push(traceForCompany(companyName, sectors[sectorName][industryName][companyName]))
+  plotTracesInDiv("myDiv", displayedTraces);
 }
 
 plotTracesInDiv("myDiv",displayedTraces);
+
+fetchCompanies(function() {
+  var sectorSel = document.getElementById("sectorSelector")
+  clearSectorDropdown()
+  var list = sectors.listSectors()
+  for (var sector in list) {
+    var opt = document.createElement("option")
+    opt.value = list[sector]
+    opt.innerHTML = list[sector]
+    sectorSel.appendChild(opt)
+  }
+  didSelectSector(sectorSel)
+});
