@@ -1,6 +1,6 @@
 let XAXIS_LABEL = "Year";
-let YAXIS_LABEL = "?";
-let GRAPH_TITLE = "Compustat";
+let YAXIS_LABEL = "Datapoints";
+let GRAPH_TITLE = "Consumer Discretionary Sector";
 let CSV_URL = "./cdc.csv";
 
 var displayedTraces = [];
@@ -82,7 +82,6 @@ function companyFromRow(row) {
   sectors.insert(sector, industry,company,data)
 }
 
-
 function flatten(ary) {
       var ret = [];
       for(var i = 0; i < ary.length; i++) {
@@ -112,6 +111,7 @@ function didSelectSector(select) {
 function didSelectIndustry(select) {
   var sector = document.getElementById("sectorSelector").value
   var companySel = document.getElementById("companySelector")
+  var sectorSel = document.getElementById("sectorSelector")
   clearCompanyDropdown();
   var companies = sectors.listCompanies(sector, select.value)
   for (var company in companies) {
@@ -151,6 +151,7 @@ function addLine() {
   plotTracesInDiv("myDiv", displayedTraces);
 }
 
+fetchCompanies();
 plotTracesInDiv("myDiv",displayedTraces);
 
 fetchCompanies(function() {
