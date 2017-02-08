@@ -147,7 +147,8 @@ function addLine() {
   var sectorName = document.getElementById("sectorSelector").value
   var industryName = document.getElementById("industrySelector").value
   var companyName = document.getElementById("companySelector").value
-  displayedTraces.push(traceForCompany(companyName, sectors[sectorName][industryName][companyName]))
+  let trace = traceForCompany(companyName, sectors.data[sectorName][industryName][companyName])
+  displayedTraces.push(trace)
   plotTracesInDiv("myDiv", displayedTraces);
 }
 
