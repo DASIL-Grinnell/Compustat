@@ -1,7 +1,7 @@
 let XAXIS_LABEL = "Year";
-let YAXIS_LABEL = "Datapoints";
+let YAXIS_LABEL = "Debt Ratio";
 let GRAPH_TITLE = "Consumer Discretionary Sector";
-let CSV_URL = "./cdc.csv";
+let CSV_URL = "./consumer_discretionary_debt_ratio.csv";
 
 var displayedTraces = [];
 
