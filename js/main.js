@@ -94,6 +94,10 @@ function flatten(ary) {
       return ret;
 }
 
+function didSelectSet(select) {
+
+}
+
 function didSelectSector(select) {
   var industrySel = document.getElementById("industrySelector")
   var industries = sectors.listIndustries(select.value);
