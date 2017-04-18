@@ -33,10 +33,29 @@ var sectors = {
   }
 }
 
-function clear() {
+function reset() {
+  clearDropdowns()
   displayedTraces = []
-  plotCompaniesInDiv(DIV_NAME,[]);
+  
+  var setSel = document.getElementById("setSelector")
+
+  fetchCompanies(setSel.value, "energy", function() {
+    plotCompaniesInDiv(DIV_NAME, setSel.value, []);
+
+  var sectorSel = document.getElementById("sectorSelector")
+  clearSectorDropdown()
+  var list = sectors.listSectors()
+  for (var sector in list) {
+    var opt = document.createElement("option")
+    opt.value = list[sector]
+    opt.innerHTML = list[sector]
+    sectorSel.appendChild(opt)
+  }
+  didSelectSector(sectorSel)
+});
+
 }
+
 
 // Returns array of industries in sector. Null for all sectors
 
@@ -94,13 +113,12 @@ function fetchCompanies(metric,sector,complete) {
 
 function companyFromRow(row) {
   let obj = row.data[0];
-  console.log(obj)
   let sector = obj["GICS Econ Sect (Descr)"]
   let industry = obj["GICS Industry (Descr)"]
   let company = obj["Company Name"]
   let data = {
         x: ['2000-01-01', '2001-01-01', '2002-01-01','2003-01-01', '2004-01-01', '2005-01-01', '2006-01-01','2007-01-01','2008-01-01','2009-01-01','2010-01-01','2011-01-01','2012-01-01','2013-01-01','2014-01-01','2015-01-01','2016-01-01'],
-        y: [obj["2,000.000"], obj["2,001.000"], obj["2,002.000"], obj["2,003.000"], obj["2,004.000"], obj["2,005.000"], obj["2,006.000"], obj["2,007.000"], obj["2,008.000"], obj["2,009.000"], obj["2,010.000"], obj["2,011.000"], obj["2,012.000"], obj["2,013.000"], obj["2,014.000"], obj["2,015.000"], obj["2,016.000"]]
+        y: [obj["1/1/2000"], obj["1/1/2001"], obj["1/1/2002"], obj["1/1/2003"], obj["1/1/2004"], obj["1/1/2005"], obj["1/1/2006"], obj["1/1/2007"], obj["1/1/2008"], obj["1/1/2009"], obj["1/1/2010"], obj["1/1/2011"], obj["1/1/2012"], obj["1/1/2013"], obj["1/1/2014"], obj["1/1/2015"], obj["1/1/2016"]]
       }
   sectors.insert(sector, industry,company,data)
 }
@@ -118,7 +136,10 @@ function flatten(ary) {
 }
 
 function didSelectSet(select) {
+  clear();
+  fetchCompanies(select.value, "energy", function() {
 
+  })
 }
 
 function didSelectSector(select) {
@@ -176,20 +197,8 @@ function addLine() {
   var companyName = document.getElementById("companySelector").value
   let trace = traceForCompany(companyName, sectors.data[sectorName][industryName][companyName])
   displayedTraces.push(trace)
-  plotTracesInDiv("myDiv", displayedTraces);
+  var setSel = document.getElementById("setSelector")
+  plotTracesInDiv("myDiv", setSel.value,displayedTraces);
 }
 
-plotTracesInDiv("myDiv",displayedTraces);
-
-fetchCompanies("Cash Flow", "energy", function() {
-  var sectorSel = document.getElementById("sectorSelector")
-  clearSectorDropdown()
-  var list = sectors.listSectors()
-  for (var sector in list) {
-    var opt = document.createElement("option")
-    opt.value = list[sector]
-    opt.innerHTML = list[sector]
-    sectorSel.appendChild(opt)
-  }
-  didSelectSector(sectorSel)
-});
+reset()
