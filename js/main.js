@@ -1,7 +1,13 @@
 let XAXIS_LABEL = "Year";
 let YAXIS_LABEL = "Debt Ratio";
 let GRAPH_TITLE = "Consumer Discretionary Sector";
-let CSV_URL = "./consumer_discretionary_debt_ratio.csv";
+
+let DIV_NAME = "myDiv"
+
+let DATA_ROOT_URL = "./data"
+let DEBT_RATIO_PATH = "/debtratio/"
+let EARNINGS_PATH = "/earningspershare/"
+let CASH_FLOW_PATH= "/cashflow/"
 
 var displayedTraces = [];
 
@@ -27,6 +33,11 @@ var sectors = {
   }
 }
 
+function clear() {
+  displayedTraces = []
+  plotCompaniesInDiv(DIV_NAME,[]);
+}
+
 // Returns array of industries in sector. Null for all sectors
 
 function traceForCompany(name, data) {
@@ -39,12 +50,12 @@ function traceForCompany(name, data) {
   return trace;
 }
 
-function plotCompaniesInDiv(divID, companies) {
+function plotCompaniesInDiv(divID, ylabel,companies) {
   let traces = companies.map(traceForCompany);
-  plotTracesInDiv(divID, traces);
+  plotTracesInDiv(divID, ylabel,traces);
 }
 
-function plotTracesInDiv(divID, traces) {
+function plotTracesInDiv(divID, ylabel, traces) {
   let layout = {
     title: GRAPH_TITLE,
     xaxis: {
@@ -52,15 +63,26 @@ function plotTracesInDiv(divID, traces) {
       type: 'date'
     },
     yaxis: {
-      title: YAXIS_LABEL,
+      title: ylabel,
     },
   };
 
   Plotly.newPlot(divID, traces, layout);
 }
 
-function fetchCompanies(complete) {
-  Papa.parse(CSV_URL, {
+function dataURL(metric,sector) {
+  switch (metric) {
+    case "Debt Ratio":
+      return DATA_ROOT_URL + DEBT_RATIO_PATH + sector + ".csv"
+    case "Earnings Per Share":
+      return DATA_ROOT_URL + EARNINGS_PATH + sector + ".csv"
+    case "Cash Flow":
+      return DATA_ROOT_URL + CASH_FLOW_PATH + sector + ".csv"
+  }
+}
+
+function fetchCompanies(metric,sector,complete) {
+  Papa.parse(dataURL(metric,sector), {
     download: true,
     header: true,
     // function(row)
@@ -72,12 +94,13 @@ function fetchCompanies(complete) {
 
 function companyFromRow(row) {
   let obj = row.data[0];
+  console.log(obj)
   let sector = obj["GICS Econ Sect (Descr)"]
   let industry = obj["GICS Industry (Descr)"]
   let company = obj["Company Name"]
   let data = {
-        x: ['1998-01-01' , '1999-01-01', '2000-01-01', '2001-01-01', '2002-01-01','2003-01-01', '2004-01-01', '2005-01-01', '2006-01-01','2007-01-01','2008-01-01','2009-01-01','2010-01-01','2011-01-01','2012-01-01','2013-01-01'],
-        y: [obj["1998"], obj["1999"], obj["2000"], obj["2001"], obj["2002"], obj["2003"], obj["2004"], obj["2005"], obj["2006"], obj["2007"], obj["2008"], obj["2009"], obj["2010"], obj["2011"], obj["2012"], obj["2013"]]
+        x: ['2000-01-01', '2001-01-01', '2002-01-01','2003-01-01', '2004-01-01', '2005-01-01', '2006-01-01','2007-01-01','2008-01-01','2009-01-01','2010-01-01','2011-01-01','2012-01-01','2013-01-01'],
+        y: [obj["1/1/2000"], obj["1/1/2001"], obj["1/1/2002"], obj["1/1/2003"], obj["1/1/2004"], obj["1/1/2005"], obj["1/1/2006"], obj["1/1/2007"], obj["1/1/2008"], obj["1/1/2009"], obj["1/1/2010"], obj["1/1/2011"], obj["1/1/2012"], obj["1/1/2013"]]
       }
   sectors.insert(sector, industry,company,data)
 }
@@ -152,10 +175,9 @@ function addLine() {
   plotTracesInDiv("myDiv", displayedTraces);
 }
 
-fetchCompanies();
 plotTracesInDiv("myDiv",displayedTraces);
 
-fetchCompanies(function() {
+fetchCompanies("Cash Flow", "energy", function() {
   var sectorSel = document.getElementById("sectorSelector")
   clearSectorDropdown()
   var list = sectors.listSectors()
