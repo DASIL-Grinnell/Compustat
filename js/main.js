@@ -8,7 +8,10 @@ let DATA_ROOT_URL = "./data"
 let DEBT_RATIO_PATH = "/debtratio/"
 let EARNINGS_PATH = "/earningspershare/"
 let CASH_FLOW_PATH= "/cashflow/"
+let SCALED_INVESTMENT_PATH= "/scaledinvestment/"
+let DIVIDEND_YIELD_PATH= "/dividendyield/"
 
+let SECTORS = ["consumerdiscretionary","consumerstaples","energy","financials","healthcare","industrials","informationtechnology","materials","realestate","telecommunicationservices", "utilities"]
 var displayedTraces = [];
 
 var sectors = {
@@ -38,11 +41,11 @@ function reset() {
   displayedTraces = []
   
   var setSel = document.getElementById("setSelector")
-
-  fetchCompanies(setSel.value, "energy", function() {
-    plotCompaniesInDiv(DIV_NAME, setSel.value, []);
+  plotCompaniesInDiv(DIV_NAME, setSel.value, []);
 
   var sectorSel = document.getElementById("sectorSelector")
+  fetchSectors(setSel.value, function() {
+
   clearSectorDropdown()
   var list = sectors.listSectors()
   for (var sector in list) {
@@ -97,6 +100,10 @@ function dataURL(metric,sector) {
       return DATA_ROOT_URL + EARNINGS_PATH + sector + ".csv"
     case "Cash Flow":
       return DATA_ROOT_URL + CASH_FLOW_PATH + sector + ".csv"
+    case "Scaled Investment":
+      return DATA_ROOT_URL + SCALED_INVESTMENT_PATH + sector + ".csv"
+    case "Dividend Yield":
+      return DATA_ROOT_URL + DIVIDEND_YIELD_PATH + sector + ".csv"
   }
 }
 
@@ -135,11 +142,15 @@ function flatten(ary) {
       return ret;
 }
 
-function didSelectSet(select) {
-  clear();
-  fetchCompanies(select.value, "energy", function() {
-
+function fetchSectors(dataset, aftereach) {
+  SECTORS.map(function(sector) {
+    fetchCompanies(dataset,sector,aftereach)
   })
+}
+
+function didSelectSet(select) {
+  reset();
+  fetchSectors(select.value)
 }
 
 function didSelectSector(select) {
